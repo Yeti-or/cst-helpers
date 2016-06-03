@@ -1,0 +1,17 @@
+{
+  "name": "cst-helpers",
+  "version": "0.0.1",
+  "description": "helpers for CST",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cst"
+  ],
+  "author": "Vasiliy Loginevskiy <yeti.or@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cst": "^0.3.0"
+  }
+}
