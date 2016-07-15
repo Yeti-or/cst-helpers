@@ -1,10 +1,10 @@
 {
   "name": "cst-helpers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "helpers for CST",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests"
   },
   "keywords": [
     "cst"
