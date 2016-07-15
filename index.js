@@ -60,5 +60,30 @@ function removeElementFromObject(el, obj) {
     obj.removeChild(el);
 }
 
+function createArray(elements, whiteSpaces) {
+
+    if (!elements || !Array.isArray(elements)) {
+        throw new Error('provide array of elements');
+    }
+
+    var arr = [];
+
+    arr.push(new Token('Punctuator', '['));
+
+    for (var i = 0; i < elements.length; i++) {
+        if (i > 0) {
+            arr.push(new Token('Punctuator', ','));
+            whiteSpaces && arr.push(new Token('Whitespace', ' '));
+        }
+
+        arr.push(elements[i].cloneElement());
+    }
+
+    arr.push(new Token('Punctuator', ']'));
+
+    return new types.ArrayExpression(arr);
+}
+
 module.exports.removeElementFromArray = removeElementFromArray;
 module.exports.removeElementFromObject = removeElementFromObject;
+module.exports.createArray = createArray;
