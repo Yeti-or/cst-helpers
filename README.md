@@ -9,3 +9,5 @@ Bunch of helpers to work with [CST](https://github.com/cst/cst)
 
 ## Array helpers
 ## Object helpers
+
+**NB** If you see such error: `Cannot add element to several parents` don't forget to `element.cloneElement()`.
