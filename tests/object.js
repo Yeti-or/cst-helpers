@@ -39,6 +39,43 @@ describe('Object:', () => {
 			expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
 		});
 
+        describe('opts', () => {
+            it('should work without opts', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            });
+
+            it('spaceBeforeObjectValues', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceBeforeObjectValues: true});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceBeforeObjectValues: false});
+                expect(obj.getSourceCode()).to.eql('{1:1, 2:2}');
+            });
+
+            it('spaceAfterObjectKeys', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceAfterObjectKeys: true});
+                expect(obj.getSourceCode()).to.eql('{1 : 1, 2 : 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceAfterObjectKeys: false});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            });
+        });
+
     });
 
 });
