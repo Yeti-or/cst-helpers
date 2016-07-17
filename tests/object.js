@@ -272,7 +272,7 @@ describe('Object:', () => {
             var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
             var obj = helpers.createObject(toMap({1: one}));
             var prop = helpers.getPropFromObjectByKeyName(obj, 1);
-            helpers.removeElementFromObject(obj, prop);
+            helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{}');
         });
 

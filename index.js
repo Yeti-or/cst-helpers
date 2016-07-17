@@ -7,7 +7,7 @@ module.exports.removeElementFromArray = array.removeElementFromArray;
 
 // Object helpers
 module.exports.createObject = object.createObject;
-module.exports.removeElementFromObject = object.removeElementFromObject;
+module.exports.removePropertyFromObject = object.removePropertyFromObject;
 module.exports.getKeysFromObject = object.getKeysFromObject;
 module.exports.getValuesFromObject = object.getValuesFromObject;
 module.exports.getPropFromObjectByKeyName = object.getPropFromObjectByKeyName;
