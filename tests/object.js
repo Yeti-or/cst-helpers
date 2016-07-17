@@ -14,11 +14,6 @@ var toMap = function(obj) {
     return map;
 };
 
-// TODO: move to util?
-var valOrName = function(v) {
-    return (v.value || v.value === false) ? v.value : v.name;
-};
-
 describe('Object:', () => {
 
     describe('create', () => {
@@ -241,7 +236,7 @@ describe('Object:', () => {
             it('should get all keys from object', () => {
                 var obj = this.createObj();
                 var keys = helpers.getKeysFromObject(obj);
-                expect(keys.map(valOrName)).to.eql(['1', '2', 'three', '4']);
+                expect(keys).to.eql(['1', '2', 'three', '4']);
             });
 
             it('should get empty arr of keys from empty obj', () => {
@@ -254,7 +249,7 @@ describe('Object:', () => {
             it('should get all values from object', () => {
                 var obj = this.createObj();
                 var values = helpers.getValuesFromObject(obj);
-                expect(values.map(valOrName)).to.eql([1, 'x', '@', false]);
+                expect(values).to.eql([1, 'x', '@', false]);
             });
 
             it('should get empty arr of keys from empty obj', () => {
