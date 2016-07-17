@@ -22,62 +22,62 @@ var valOrName = function(v) {
 describe('Object:', () => {
 
     describe('create', () => {
-		it('should create empty object', () => {
-			var obj = helpers.createObject(new Map());
-			expect(obj.getSourceCode()).to.eql('{}');
-		});
+        it('should create empty object', () => {
+            var obj = helpers.createObject(new Map());
+            expect(obj.getSourceCode()).to.eql('{}');
+        });
 
-		it('should throw if we provide not object', () => {
-			expect(() => helpers.createObject()).to.throw(Error);
-			var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
-			expect(() => helpers.createObject(one)).to.throw(Error);
-		});
+        it('should throw if we provide not object', () => {
+            expect(() => helpers.createObject()).to.throw(Error);
+            var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
+            expect(() => helpers.createObject(one)).to.throw(Error);
+        });
 
-		it('should create simple object object', () => {
-			var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
+        it('should create simple object object', () => {
+            var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
             var map = new Map();
             map.set(1, one);
-			var obj = helpers.createObject(map);
+            var obj = helpers.createObject(map);
 
-			expect(obj.getSourceCode()).to.eql('{1: 1}');
-		});
+            expect(obj.getSourceCode()).to.eql('{1: 1}');
+        });
 
         it('should create object with numreric as value', () => {
-			var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-			var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+            var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+            var two = new types.NumericLiteral([new Token('Numeric', 2)]);
             var map = new Map();
             map.set(1, one);
             map.set(2, two);
-			var obj = helpers.createObject(map);
+            var obj = helpers.createObject(map);
 
-			expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
         });
 
         it('should create object with String as value', () => {
-			var one = new types.StringLiteral([new Token('String', 'one')]);
-			var two = new types.StringLiteral([new Token('String', 'two')]);
+            var one = new types.StringLiteral([new Token('String', 'one')]);
+            var two = new types.StringLiteral([new Token('String', 'two')]);
             var map = new Map();
             map.set(1, one);
             map.set(2, two);
-			var obj = helpers.createObject(map);
+            var obj = helpers.createObject(map);
 
-			expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}');
+            expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}');
         });
 
         it('should create object with identifier as value', () => {
-			var one = new types.Identifier([new Token('Identifier', 'x')]);
-			var two = new types.Identifier([new Token('Identifier', 'y')]);
+            var one = new types.Identifier([new Token('Identifier', 'x')]);
+            var two = new types.Identifier([new Token('Identifier', 'y')]);
             var map = new Map();
             map.set(1, one);
             map.set(2, two);
-			var obj = helpers.createObject(map);
+            var obj = helpers.createObject(map);
 
-			expect(obj.getSourceCode()).to.eql('{1: x, 2: y}');
+            expect(obj.getSourceCode()).to.eql('{1: x, 2: y}');
         });
 
-		it('should create object with diff elements', () => {
+        it('should create object with diff elements', () => {
             var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-			var two = new types.Identifier([new Token('Identifier', 'x')]);
+            var two = new types.Identifier([new Token('Identifier', 'x')]);
             var three = new types.StringLiteral([new Token('String', '@@@')]);
             var four = new types.BooleanLiteral([new Token('Boolean', false)]);
             // var five = new types.StringLiteral([new Token('String', "doublequote")]);
@@ -87,11 +87,11 @@ describe('Object:', () => {
             map.set(2, two);
             map.set('three', three);
             map.set(4, four);
-			var obj = helpers.createObject(map);
+            var obj = helpers.createObject(map);
 
-			expect(obj.getSourceCode())
+            expect(obj.getSourceCode())
                 .to.eql('{1: 1, 2: x, three: \'@@@\', 4: false}');
-		});
+        });
 
         describe('opts', () => {
             beforeEach(() => {
@@ -101,11 +101,7 @@ describe('Object:', () => {
                     var map = new Map();
                     map.set(1, one);
                     map.set(2, two);
-                    if (opts) {
-                        return helpers.createObject(map, opts);
-                    } else {
-                        return helpers.createObject(map);
-                    }
+                    return helpers.createObject(map, opts);
                 };
             });
 
@@ -203,11 +199,7 @@ describe('Object:', () => {
                 map.set(2, new types.Identifier([new Token('Identifier', 'x')]));
                 map.set('three', new types.StringLiteral([new Token('String', '@')]));
                 map.set('4', new types.BooleanLiteral([new Token('Boolean', false)]));
-                if (opts) {
-                    return helpers.createObject(map, opts);
-                } else {
-                    return helpers.createObject(map);
-                }
+                return helpers.createObject(map, opts);
             };
         });
 
@@ -226,6 +218,7 @@ describe('Object:', () => {
                 expect(helpers.getKeysFromObject(obj)).to.eql([]);
             });
         });
+
         describe('values', () => {
             it('should get all values from object', () => {
                 var obj = this.createObj();
@@ -239,15 +232,23 @@ describe('Object:', () => {
         });
     });
 
+    describe('update', () => {
+        describe('update prop.value for keyName', () => {});
+        describe('update prop.keyName for keyName', () => {});
+    });
+
+    describe('add prop', () => {
+    });
+
     describe('remove', () => {
         it('should remove from object {x:x}', () => {
-			var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
-			var obj = helpers.createObject(toMap({1: one}));
+            var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
+            var obj = helpers.createObject(toMap({1: one}));
             var prop = helpers.getPropFromObjectByKeyName(obj, 1);
             helpers.removeElementFromObject(obj, prop);
-			expect(obj.getSourceCode()).to.eql('{}');
+            expect(obj.getSourceCode()).to.eql('{}');
         });
 
-   });
+    });
 
 });
