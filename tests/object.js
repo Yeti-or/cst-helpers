@@ -7,11 +7,23 @@ var types = cst.types;
 
 var helpers = require('..');
 
+// TODO: move to util?
+var toMap = function(obj) {
+    var map = new Map();
+    Object.keys(obj).forEach(key => map.set(key, obj[key]));
+    return map;
+};
+
+// TODO: move to util?
+var valOrName = function(v) {
+    return (v.value || v.value === false) ? v.value : v.name;
+};
+
 describe('Object:', () => {
 
     describe('create', () => {
 		it('should create empty object', () => {
-			var obj = helpers.createObject({});
+			var obj = helpers.createObject(new Map());
 			expect(obj.getSourceCode()).to.eql('{}');
 		});
 
@@ -21,20 +33,22 @@ describe('Object:', () => {
 			expect(() => helpers.createObject(one)).to.throw(Error);
 		});
 
-		it('should create object', () => {
+		it('should create simple object object', () => {
 			var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
-			var obj = helpers.createObject({1: one});
+            var map = new Map();
+            map.set(1, one);
+			var obj = helpers.createObject(map);
 
 			expect(obj.getSourceCode()).to.eql('{1: 1}');
-
-			obj = helpers.createObject({'one': one.cloneElement()});
-			expect(obj.getSourceCode()).to.eql('{one: 1}');
 		});
 
         it('should create object with numreric as value', () => {
 			var one = new types.NumericLiteral([new Token('Numeric', 1)]);
 			var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-			var obj = helpers.createObject({1: one, 2: two});
+            var map = new Map();
+            map.set(1, one);
+            map.set(2, two);
+			var obj = helpers.createObject(map);
 
 			expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
         });
@@ -42,7 +56,10 @@ describe('Object:', () => {
         it('should create object with String as value', () => {
 			var one = new types.StringLiteral([new Token('String', 'one')]);
 			var two = new types.StringLiteral([new Token('String', 'two')]);
-			var obj = helpers.createObject({1: one, 2: two});
+            var map = new Map();
+            map.set(1, one);
+            map.set(2, two);
+			var obj = helpers.createObject(map);
 
 			expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}');
         });
@@ -50,137 +67,127 @@ describe('Object:', () => {
         it('should create object with identifier as value', () => {
 			var one = new types.Identifier([new Token('Identifier', 'x')]);
 			var two = new types.Identifier([new Token('Identifier', 'y')]);
-			var obj = helpers.createObject({1: one, 2: two});
+            var map = new Map();
+            map.set(1, one);
+            map.set(2, two);
+			var obj = helpers.createObject(map);
 
 			expect(obj.getSourceCode()).to.eql('{1: x, 2: y}');
         });
 
-        // TODO: Order
-		xit('should create object with diff elements', () => {
+		it('should create object with diff elements', () => {
             var one = new types.NumericLiteral([new Token('Numeric', 1)]);
 			var two = new types.Identifier([new Token('Identifier', 'x')]);
             var three = new types.StringLiteral([new Token('String', '@@@')]);
             var four = new types.BooleanLiteral([new Token('Boolean', false)]);
             // var five = new types.StringLiteral([new Token('String', "doublequote")]);
 
-            var obj = helpers.createObject({1: one, 2: two, 'three': three, '4': four});
+            var map = new Map();
+            map.set(1, one);
+            map.set(2, two);
+            map.set('three', three);
+            map.set(4, four);
+			var obj = helpers.createObject(map);
 
 			expect(obj.getSourceCode())
                 .to.eql('{1: 1, 2: x, three: \'@@@\', 4: false}');
 		});
 
         describe('opts', () => {
-            it('should work without opts', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
+            beforeEach(() => {
+                this.createObj = (opts) => {
+                    var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                    var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                    var map = new Map();
+                    map.set(1, one);
+                    map.set(2, two);
+                    if (opts) {
+                        return helpers.createObject(map, opts);
+                    } else {
+                        return helpers.createObject(map);
+                    }
+                };
+            });
 
+            afterEach(() => {
+                this.createObject = null;
+            });
+
+            it('should work without opts', () => {
+                var obj = this.createObj();
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('spaceBeforeObjectValues', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
-
+                var obj = this.createObj({spaceBeforeObjectValues: true});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {});
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceBeforeObjectValues: true});
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceBeforeObjectValues: false});
+                obj = this.createObj({spaceBeforeObjectValues: false});
                 expect(obj.getSourceCode()).to.eql('{1:1, 2:2}');
             });
 
             it('spaceAfterObjectKeys', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
-
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceAfterObjectKeys: true});
+                var obj = this.createObj({spaceAfterObjectKeys: true});
                 expect(obj.getSourceCode()).to.eql('{1 : 1, 2 : 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceAfterObjectKeys: false});
+                obj = this.createObj({spaceAfterObjectKeys: false});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('spacesInsideObjectBrackets', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
-
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spacesInsideObjectBrackets: true});
+                var obj = this.createObj({spacesInsideObjectBrackets: true});
                 expect(obj.getSourceCode()).to.eql('{ 1: 1, 2: 2 }');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spacesInsideObjectBrackets: false});
+                obj = this.createObj({spacesInsideObjectBrackets: false});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('paddingNewLinesInObjects', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
-
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {paddingNewLinesInObjects: true});
+                var obj = this.createObj({paddingNewLinesInObjects: true});
                 expect(obj.getSourceCode()).to.eql('{\n1: 1, 2: 2\n}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {paddingNewLinesInObjects: false});
+                obj = this.createObj({paddingNewLinesInObjects: false});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('objectKeysOnNewLine', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
-
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {objectKeysOnNewLine: true});
+                var obj = this.createObj({objectKeysOnNewLine: true});
                 expect(obj.getSourceCode()).to.eql('{1: 1,\n2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {objectKeysOnNewLine: false});
+                obj = this.createObj({objectKeysOnNewLine: false});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('multiLine', () => {
-                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-                var obj = helpers.createObject({'1': one, '2': two});
-
-                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {multiLine: true});
+                var obj = this.createObj({multiLine: true});
                 expect(obj.getSourceCode()).to.eql('{\n1: 1,\n2: 2\n}');
-                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {multiLine: false});
+                obj = this.createObj({multiLine: false});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('quotes', () => {
                 var one = new types.StringLiteral([new Token('String', 'one')]);
                 var two = new types.StringLiteral([new Token('String', 'two')]);
-                var obj = helpers.createObject({1: one, 2: two});
+                var obj = helpers.createObject(toMap({1: one, 2: two}));
 
                 expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}', 'default');
 
-                obj = helpers.createObject({1: one.cloneElement(), 2: two.cloneElement()}, {singleQuotes: true});
+                obj = helpers.createObject(toMap({1: one.cloneElement(), 2: two.cloneElement()}), {singleQuotes: true});
                 expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}', 'singleQuote');
 
-                obj = helpers.createObject({1: one.cloneElement(), 2: two.cloneElement()}, {singleQuotes: false});
+                obj = helpers.createObject(toMap({1: one.cloneElement(), 2: two.cloneElement()}), {singleQuotes: false});
                 expect(obj.getSourceCode()).to.eql('{1: "one", 2: "two"}', 'doubleQuote');
             });
 
             it('quotedKeysInObjects', () => {
                 var one = new types.StringLiteral([new Token('String', 'one')]);
                 var two = new types.StringLiteral([new Token('String', 'two')]);
-                var obj = helpers.createObject({one: one, two: two});
+                var obj = helpers.createObject(toMap({one: one, two: two}));
 
                 expect(obj.getSourceCode()).to.eql('{one: \'one\', two: \'two\'}', 'default');
 
-                obj = helpers.createObject({one: one.cloneElement(), two: two.cloneElement()}, {quotedKeysInObjects: true, singleQuotes: true});
+                obj = helpers.createObject(toMap({one: one.cloneElement(), two: two.cloneElement()}), {quotedKeysInObjects: true, singleQuotes: true});
                 expect(obj.getSourceCode()).to.eql('{\'one\': \'one\', \'two\': \'two\'}', 'singleQuote');
 
-                obj = helpers.createObject({one: one.cloneElement(), two: two.cloneElement()}, {quotedKeysInObjects: true, singleQuotes: false});
+                obj = helpers.createObject(toMap({one: one.cloneElement(), two: two.cloneElement()}), {quotedKeysInObjects: true, singleQuotes: false});
                 expect(obj.getSourceCode()).to.eql('{"one": "one", "two": "two"}', 'doubleQuote');
 
-                obj = helpers.createObject({one: one.cloneElement(), two: two.cloneElement()}, {quotedKeysInObjects: false});
+                obj = helpers.createObject(toMap({one: one.cloneElement(), two: two.cloneElement()}), {quotedKeysInObjects: false});
                 expect(obj.getSourceCode()).to.eql('{one: \'one\', two: \'two\'}', 'don\'t quote');
             });
 
@@ -188,35 +195,45 @@ describe('Object:', () => {
 
     });
 
-    xdescribe('get', () => {
+    describe('get', () => {
         beforeEach(() => {
-            var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-			var two = new types.Identifier([new Token('Identifier', 'x')]);
-            var three = new types.StringLiteral([new Token('String', '@')]);
-            var four = new types.BooleanLiteral([new Token('Boolean', false)]);
-            this.obj = helpers.createObject({1: one, 2: two, 'three': three, '4': four});
+            this.createObj = (opts) => {
+                var map = new Map();
+                map.set(1, new types.NumericLiteral([new Token('Numeric', 1)]));
+                map.set(2, new types.Identifier([new Token('Identifier', 'x')]));
+                map.set('three', new types.StringLiteral([new Token('String', '@')]));
+                map.set('4', new types.BooleanLiteral([new Token('Boolean', false)]));
+                if (opts) {
+                    return helpers.createObject(map, opts);
+                } else {
+                    return helpers.createObject(map);
+                }
+            };
         });
+
         afterEach(() => {
-            this.obj = null;
+            this.createObject = null;
         });
+
         describe('keys', () => {
             it('should get all keys from object', () => {
-                var keys = helpers.getKeysFromObject(this.obj);
-                // TODO: order ?
-                expect(keys.map(k => k.value)).to.eql(['1', '2', 'three', '4']);
+                var obj = this.createObj();
+                var keys = helpers.getKeysFromObject(obj);
+                expect(keys.map(valOrName)).to.eql(['1', '2', 'three', '4']);
             });
             it('should get empty arr of keys from empty obj', () => {
-                var obj = helpers.createObject({});
+                var obj = helpers.createObject(toMap({}));
                 expect(helpers.getKeysFromObject(obj)).to.eql([]);
             });
         });
         describe('values', () => {
             it('should get all values from object', () => {
-                var keys = helpers.getValuesFromObject(this.obj);
-                expect(keys.map(k => k.value ? k.value : k.name)).to.eql([1, '@']);
+                var obj = this.createObj();
+                var values = helpers.getValuesFromObject(obj);
+                expect(values.map(valOrName)).to.eql([1, 'x', '@', false]);
             });
             it('should get empty arr of keys from empty obj', () => {
-                var obj = helpers.createObject({});
+                var obj = helpers.createObject(toMap({}));
                 expect(helpers.getValuesFromObject(obj)).to.eql([]);
             });
         });
@@ -225,7 +242,7 @@ describe('Object:', () => {
     describe('remove', () => {
         it('should remove from object {x:x}', () => {
 			var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
-			var obj = helpers.createObject({1: one});
+			var obj = helpers.createObject(toMap({1: one}));
             var prop = helpers.getPropFromObjectByKeyName(obj, 1);
             helpers.removeElementFromObject(obj, prop);
 			expect(obj.getSourceCode()).to.eql('{}');
