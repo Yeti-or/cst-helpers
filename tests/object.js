@@ -31,12 +31,42 @@ describe('Object:', () => {
 			expect(obj.getSourceCode()).to.eql('{one: 1}');
 		});
 
-		it('should create object with severals elements', () => {
+        it('should create object with numreric as value', () => {
 			var one = new types.NumericLiteral([new Token('Numeric', 1)]);
 			var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-			var obj = helpers.createObject({'1': one, '2': two});
+			var obj = helpers.createObject({1: one, 2: two});
 
 			expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+        });
+
+        it('should create object with String as value', () => {
+			var one = new types.StringLiteral([new Token('String', 'one')]);
+			var two = new types.StringLiteral([new Token('String', 'two')]);
+			var obj = helpers.createObject({1: one, 2: two});
+
+			expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}');
+        });
+
+        it('should create object with identifier as value', () => {
+			var one = new types.Identifier([new Token('Identifier', 'x')]);
+			var two = new types.Identifier([new Token('Identifier', 'y')]);
+			var obj = helpers.createObject({1: one, 2: two});
+
+			expect(obj.getSourceCode()).to.eql('{1: x, 2: y}');
+        });
+
+        // TODO: Order
+		xit('should create object with diff elements', () => {
+            var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+			var two = new types.Identifier([new Token('Identifier', 'x')]);
+            var three = new types.StringLiteral([new Token('String', '@@@')]);
+            var four = new types.BooleanLiteral([new Token('Boolean', false)]);
+            // var five = new types.StringLiteral([new Token('String', "doublequote")]);
+
+            var obj = helpers.createObject({1: one, 2: two, 'three': three, '4': four});
+
+			expect(obj.getSourceCode())
+                .to.eql('{1: 1, 2: x, three: \'@@@\', 4: false}');
 		});
 
         describe('opts', () => {
@@ -123,8 +153,84 @@ describe('Object:', () => {
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
+            it('quotes', () => {
+                var one = new types.StringLiteral([new Token('String', 'one')]);
+                var two = new types.StringLiteral([new Token('String', 'two')]);
+                var obj = helpers.createObject({1: one, 2: two});
+
+                expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}', 'default');
+
+                obj = helpers.createObject({1: one.cloneElement(), 2: two.cloneElement()}, {singleQuotes: true});
+                expect(obj.getSourceCode()).to.eql('{1: \'one\', 2: \'two\'}', 'singleQuote');
+
+                obj = helpers.createObject({1: one.cloneElement(), 2: two.cloneElement()}, {singleQuotes: false});
+                expect(obj.getSourceCode()).to.eql('{1: "one", 2: "two"}', 'doubleQuote');
+            });
+
+            it('quotedKeysInObjects', () => {
+                var one = new types.StringLiteral([new Token('String', 'one')]);
+                var two = new types.StringLiteral([new Token('String', 'two')]);
+                var obj = helpers.createObject({one: one, two: two});
+
+                expect(obj.getSourceCode()).to.eql('{one: \'one\', two: \'two\'}', 'default');
+
+                obj = helpers.createObject({one: one.cloneElement(), two: two.cloneElement()}, {quotedKeysInObjects: true, singleQuotes: true});
+                expect(obj.getSourceCode()).to.eql('{\'one\': \'one\', \'two\': \'two\'}', 'singleQuote');
+
+                obj = helpers.createObject({one: one.cloneElement(), two: two.cloneElement()}, {quotedKeysInObjects: true, singleQuotes: false});
+                expect(obj.getSourceCode()).to.eql('{"one": "one", "two": "two"}', 'doubleQuote');
+
+                obj = helpers.createObject({one: one.cloneElement(), two: two.cloneElement()}, {quotedKeysInObjects: false});
+                expect(obj.getSourceCode()).to.eql('{one: \'one\', two: \'two\'}', 'don\'t quote');
+            });
+
         });
 
     });
+
+    xdescribe('get', () => {
+        beforeEach(() => {
+            var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+			var two = new types.Identifier([new Token('Identifier', 'x')]);
+            var three = new types.StringLiteral([new Token('String', '@')]);
+            var four = new types.BooleanLiteral([new Token('Boolean', false)]);
+            this.obj = helpers.createObject({1: one, 2: two, 'three': three, '4': four});
+        });
+        afterEach(() => {
+            this.obj = null;
+        });
+        describe('keys', () => {
+            it('should get all keys from object', () => {
+                var keys = helpers.getKeysFromObject(this.obj);
+                // TODO: order ?
+                expect(keys.map(k => k.value)).to.eql(['1', '2', 'three', '4']);
+            });
+            it('should get empty arr of keys from empty obj', () => {
+                var obj = helpers.createObject({});
+                expect(helpers.getKeysFromObject(obj)).to.eql([]);
+            });
+        });
+        describe('values', () => {
+            it('should get all values from object', () => {
+                var keys = helpers.getValuesFromObject(this.obj);
+                expect(keys.map(k => k.value ? k.value : k.name)).to.eql([1, '@']);
+            });
+            it('should get empty arr of keys from empty obj', () => {
+                var obj = helpers.createObject({});
+                expect(helpers.getValuesFromObject(obj)).to.eql([]);
+            });
+        });
+    });
+
+    describe('remove', () => {
+        it('should remove from object {x:x}', () => {
+			var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
+			var obj = helpers.createObject({1: one});
+            var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+            helpers.removeElementFromObject(obj, prop);
+			expect(obj.getSourceCode()).to.eql('{}');
+        });
+
+   });
 
 });
