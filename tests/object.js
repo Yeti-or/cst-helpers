@@ -74,6 +74,55 @@ describe('Object:', () => {
                 obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spaceAfterObjectKeys: false});
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
+
+            it('spacesInsideObjectBrackets', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spacesInsideObjectBrackets: true});
+                expect(obj.getSourceCode()).to.eql('{ 1: 1, 2: 2 }');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {spacesInsideObjectBrackets: false});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            });
+
+            it('paddingNewLinesInObjects', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {paddingNewLinesInObjects: true});
+                expect(obj.getSourceCode()).to.eql('{\n1: 1, 2: 2\n}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {paddingNewLinesInObjects: false});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            });
+
+            it('objectKeysOnNewLine', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {objectKeysOnNewLine: true});
+                expect(obj.getSourceCode()).to.eql('{1: 1,\n2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {objectKeysOnNewLine: false});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            });
+
+            it('multiLine', () => {
+                var one = new types.NumericLiteral([new Token('Numeric', 1)]);
+                var two = new types.NumericLiteral([new Token('Numeric', 2)]);
+                var obj = helpers.createObject({'1': one, '2': two});
+
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {multiLine: true});
+                expect(obj.getSourceCode()).to.eql('{\n1: 1,\n2: 2\n}');
+                obj = helpers.createObject({'1': one.cloneElement(), '2': two.cloneElement()}, {multiLine: false});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+            });
+
         });
 
     });
