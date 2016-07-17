@@ -207,12 +207,43 @@ describe('Object:', () => {
             this.createObject = null;
         });
 
+        describe('props', () => {
+            it('should get prop by it\'s key name', () => {
+                var obj = this.createObj();
+                var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+                expect(prop.getSourceCode()).to.eql('1: 1');
+
+                prop = helpers.getPropFromObjectByKeyName(obj, 2);
+                expect(prop.getSourceCode()).to.eql('2: x');
+
+                prop = helpers.getPropFromObjectByKeyName(obj, 'three');
+                expect(prop.getSourceCode()).to.eql('three: \'@\'');
+
+                prop = helpers.getPropFromObjectByKeyName(obj, 4);
+                expect(prop.getSourceCode()).to.eql('4: false');
+            });
+
+            it('should get no prop from empty obj', () => {
+                var obj = helpers.createObject(toMap({}));
+                expect(helpers.getPropFromObjectByKeyName(obj, 1)).to.eql(null);
+            });
+
+            it('should get no prop for wrong key', () => {
+                var obj = this.createObj();
+                var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+                expect(prop.getSourceCode()).to.eql('1: 1');
+                prop = helpers.getPropFromObjectByKeyName(obj, 42);
+                expect(prop).to.eql(null);
+            });
+        });
+
         describe('keys', () => {
             it('should get all keys from object', () => {
                 var obj = this.createObj();
                 var keys = helpers.getKeysFromObject(obj);
                 expect(keys.map(valOrName)).to.eql(['1', '2', 'three', '4']);
             });
+
             it('should get empty arr of keys from empty obj', () => {
                 var obj = helpers.createObject(toMap({}));
                 expect(helpers.getKeysFromObject(obj)).to.eql([]);
@@ -225,6 +256,7 @@ describe('Object:', () => {
                 var values = helpers.getValuesFromObject(obj);
                 expect(values.map(valOrName)).to.eql([1, 'x', '@', false]);
             });
+
             it('should get empty arr of keys from empty obj', () => {
                 var obj = helpers.createObject(toMap({}));
                 expect(helpers.getValuesFromObject(obj)).to.eql([]);
