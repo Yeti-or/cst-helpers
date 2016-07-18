@@ -252,8 +252,31 @@ describe('Object:', () => {
     });
 
     describe('update', () => {
-        describe('update prop.value for keyName', () => {});
-        describe('update prop.keyName for keyName', () => {});
+        beforeEach(() => {
+            this.createObj = (opts) => {
+                var map = new Map();
+                map.set(1, new types.NumericLiteral([Token.create('Numeric', 1)]));
+                map.set(2, new types.NumericLiteral([Token.create('Numeric', 2)]));
+                map.set(3, new types.NumericLiteral([Token.create('Numeric', 3)]));
+                return helpers.createObject(map, opts);
+            };
+        });
+
+        it('should update prop.value for keyName', () => {
+            // TODO : do we need such helper ?
+            var obj = this.createObj();
+            var prop =  helpers.getPropFromObjectByKeyName(obj, 2);
+            prop.replaceChild(this.createObj(), prop.value);
+            expect(obj.getSourceCode()).to.eql('{1: 1, 2: {1: 1, 2: 2, 3: 3}, 3: 3}');
+        });
+
+        it('update prop.keyName for keyName', () => {
+            // TODO : do we need such helper ?
+            var obj = this.createObj();
+            var prop =  helpers.getPropFromObjectByKeyName(obj, 2);
+            prop.replaceChild(new types.StringLiteral([new Token('String', '"two"')]), prop.key);
+            expect(obj.getSourceCode()).to.eql('{1: 1, "two": 2, 3: 3}');
+        });
     });
 
     describe('add prop', () => {
