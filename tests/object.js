@@ -100,10 +100,6 @@ describe('Object:', () => {
                 };
             });
 
-            afterEach(() => {
-                this.createObject = null;
-            });
-
             it('should work without opts', () => {
                 var obj = this.createObj();
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
@@ -198,10 +194,6 @@ describe('Object:', () => {
             };
         });
 
-        afterEach(() => {
-            this.createObject = null;
-        });
-
         describe('props', () => {
             it('should get prop by it\'s key name', () => {
                 var obj = this.createObj();
@@ -268,12 +260,190 @@ describe('Object:', () => {
     });
 
     describe('remove', () => {
+        beforeEach(() => {
+            this.createObj = (opts) => {
+                var map = new Map();
+                map.set(1, new types.NumericLiteral([Token.create('Numeric', 1)]));
+                map.set(2, new types.NumericLiteral([Token.create('Numeric', 2)]));
+                map.set(3, new types.NumericLiteral([Token.create('Numeric', 3)]));
+                return helpers.createObject(map, opts);
+            };
+        });
+
         it('should remove from object {x:x}', () => {
             var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
             var obj = helpers.createObject(toMap({1: one}));
             var prop = helpers.getPropFromObjectByKeyName(obj, 1);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{}');
+        });
+
+        it('should not remove prop of diff object', () => {
+            var obj1 = this.createObj();
+            var obj2 = this.createObj();
+            var prop = helpers.getPropFromObjectByKeyName(obj2, 2);
+            expect(() => {
+                helpers.removePropertyFromObject(obj1, prop);
+            }).to.throw(Error);
+            expect(obj1.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
+            expect(obj2.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
+            expect(() => {
+                helpers.removePropertyFromObjectByKeyName(obj1, prop);
+            }).to.throw(Error);
+            expect(obj1.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
+            expect(obj2.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
+        });
+
+        it('should remove from object {1:1, x:x, 3:3}', () => {
+            var obj = this.createObj();
+            var prop = helpers.getPropFromObjectByKeyName(obj, '2');
+            helpers.removePropertyFromObject(obj, prop);
+            expect(obj.getSourceCode()).to.eql('{1: 1, 3: 3}');
+
+            obj = this.createObj({spaceBeforeObjectValues: false});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{1:1, 3:3}');
+
+            obj = this.createObj({spaceAfterObjectKeys: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{1 : 1, 3 : 3}');
+
+            obj = this.createObj({spacesInsideObjectBrackets: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{ 1: 1, 3: 3 }');
+
+            obj = this.createObj({paddingNewLinesInObjects: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{\n1: 1, 3: 3\n}');
+
+            obj = this.createObj({objectKeysOnNewLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{1: 1,\n3: 3}');
+
+        });
+
+        it('should remove from object {x:x, 2:2}', () => {
+            this.createObj = (opts) => {
+                var map = new Map();
+                map.set(1, new types.NumericLiteral([Token.create('Numeric', 1)]));
+                map.set(2, new types.NumericLiteral([Token.create('Numeric', 2)]));
+                return helpers.createObject(map, opts);
+            };
+            var obj = this.createObj();
+            var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+            helpers.removePropertyFromObject(obj, prop);
+            expect(obj.getSourceCode()).to.eql('{2: 2}');
+
+            obj = this.createObj({spaceBeforeObjectValues: false});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{2:2}');
+
+            obj = this.createObj({spaceAfterObjectKeys: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{2 : 2}');
+
+            obj = this.createObj({spacesInsideObjectBrackets: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{ 2: 2 }');
+
+            obj = this.createObj({paddingNewLinesInObjects: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{\n2: 2\n}');
+
+            obj = this.createObj({objectKeysOnNewLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{2: 2}');
+
+        });
+
+        it('should remove from object {1:1, x:x}', () => {
+            this.createObj = (opts) => {
+                var map = new Map();
+                map.set(1, new types.NumericLiteral([Token.create('Numeric', 1)]));
+                map.set(2, new types.NumericLiteral([Token.create('Numeric', 2)]));
+                return helpers.createObject(map, opts);
+            };
+            var obj = this.createObj();
+            var prop = helpers.getPropFromObjectByKeyName(obj, 2);
+            helpers.removePropertyFromObject(obj, prop);
+            expect(obj.getSourceCode()).to.eql('{1: 1}');
+
+            obj = this.createObj({spaceBeforeObjectValues: false});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{1:1}');
+
+            obj = this.createObj({spaceAfterObjectKeys: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{1 : 1}');
+
+            obj = this.createObj({spacesInsideObjectBrackets: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{ 1: 1 }');
+
+            obj = this.createObj({paddingNewLinesInObjects: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{\n1: 1\n}');
+
+            obj = this.createObj({objectKeysOnNewLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{1: 1}');
+
+        });
+
+        it('should remove from object {x:x, 2:2, 3:3}', () => {
+            var obj = this.createObj();
+            var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+            helpers.removePropertyFromObject(obj, prop);
+            expect(obj.getSourceCode()).to.eql('{2: 2, 3: 3}');
+
+            obj = this.createObj({spaceBeforeObjectValues: false});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{2:2, 3:3}');
+
+            obj = this.createObj({spaceAfterObjectKeys: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{2 : 2, 3 : 3}');
+
+            obj = this.createObj({spacesInsideObjectBrackets: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{ 2: 2, 3: 3 }');
+
+            obj = this.createObj({paddingNewLinesInObjects: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{\n2: 2, 3: 3\n}');
+
+            obj = this.createObj({objectKeysOnNewLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{2: 2,\n3: 3}');
+
+        });
+
+        it('should remove from object {1:1, 2:2, x:x}', () => {
+            var obj = this.createObj();
+            var prop = helpers.getPropFromObjectByKeyName(obj, 3);
+            helpers.removePropertyFromObject(obj, prop);
+            expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+
+            obj = this.createObj({spaceBeforeObjectValues: false});
+            helpers.removePropertyFromObjectByKeyName(obj, 3);
+            expect(obj.getSourceCode()).to.eql('{1:1, 2:2}');
+
+            obj = this.createObj({spaceAfterObjectKeys: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 3);
+            expect(obj.getSourceCode()).to.eql('{1 : 1, 2 : 2}');
+
+            obj = this.createObj({spacesInsideObjectBrackets: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 3);
+            expect(obj.getSourceCode()).to.eql('{ 1: 1, 2: 2 }');
+
+            obj = this.createObj({paddingNewLinesInObjects: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 3);
+            expect(obj.getSourceCode()).to.eql('{\n1: 1, 2: 2\n}');
+
+            obj = this.createObj({objectKeysOnNewLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 3);
+            expect(obj.getSourceCode()).to.eql('{1: 1,\n2: 2}');
+
         });
 
     });
