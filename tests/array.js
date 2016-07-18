@@ -47,6 +47,52 @@ describe('Array:', () => {
         });
 
         describe('opts', () => {
+            beforeEach(() => {
+                this.createArr = (opts) => {
+                    var arr = [
+                        new types.NumericLiteral([new Token('Numeric', 1)]),
+                        new types.NumericLiteral([new Token('Numeric', 2)]),
+                        new types.NumericLiteral([new Token('Numeric', 3)])
+                    ];
+                    return helpers.createArray(arr, opts);
+                };
+            });
+
+            it('should work without opts', () => {
+                var arr = this.createArr();
+                expect(arr.getSourceCode()).to.eql('[1, 2, 3]');
+                this.createArr({});
+                expect(arr.getSourceCode()).to.eql('[1, 2, 3]');
+            });
+
+            it('spacesInsideArrayBrackets', () => {
+                var arr = this.createArr({spacesInsideArrayBrackets: true});
+                expect(arr.getSourceCode()).to.eql('[ 1, 2, 3 ]');
+                arr = this.createArr({spacesInsideArrayBrackets: false});
+                expect(arr.getSourceCode()).to.eql('[1, 2, 3]');
+            });
+
+            it('newlineAfterArrayElements', () => {
+                var arr = this.createArr({newlineAfterArrayElements: true});
+                expect(arr.getSourceCode()).to.eql('[1,\n2,\n3]');
+                arr = this.createArr({newlineAfterArrayElements: false});
+                expect(arr.getSourceCode()).to.eql('[1, 2, 3]');
+            });
+
+            it('paddingNewLinesInArray', () => {
+                var arr = this.createArr({paddingNewLinesInArray: true});
+                expect(arr.getSourceCode()).to.eql('[\n1, 2, 3\n]');
+                arr = this.createArr({paddingNewLinesInArray: false});
+                expect(arr.getSourceCode()).to.eql('[1, 2, 3]');
+            });
+
+            it('multiLine', () => {
+                var arr = this.createArr({multiLine: true});
+                expect(arr.getSourceCode()).to.eql('[\n1,\n2,\n3\n]');
+                arr = this.createArr({multiLine: false});
+                expect(arr.getSourceCode()).to.eql('[1, 2, 3]');
+            });
+
         });
 
     });

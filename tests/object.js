@@ -103,6 +103,8 @@ describe('Object:', () => {
             it('should work without opts', () => {
                 var obj = this.createObj();
                 expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
+                obj = this.createObj({});
+                expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
             });
 
             it('spaceBeforeObjectValues', () => {
