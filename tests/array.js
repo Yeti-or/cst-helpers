@@ -95,7 +95,7 @@ describe('Array:', () => {
             var arr = helpers.createArray([one, two, three]);
 
             helpers.removeElementFromArray(arr, one);
-            //expect(arr.getSourceCode()).to.eql('[2,"three"]');
+            // expect(arr.getSourceCode()).to.eql('[2,"three"]');
 
             var arr2 = helpers.createArray([(one = one.cloneElement()), two.cloneElement(), three.cloneElement()]);
 
