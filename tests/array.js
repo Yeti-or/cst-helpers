@@ -46,6 +46,8 @@ describe('Array:', () => {
             var one = new types.NumericLiteral([new Token('Numeric', 1)]);
             var two = new types.StringLiteral([new Token('String', '"str"')]);
             var arr = helpers.createArray([one, two], true);
+            // TODO: fix string
+            // TODO: check Identifier
             expect(arr.getSourceCode()).to.eql('[1, "str"]');
             var arr2 = helpers.createArray([one.cloneElement(), two.cloneElement(), arr], true);
             expect(arr2.getSourceCode()).to.eql('[1, "str", [1, "str"]]');
