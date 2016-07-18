@@ -32,25 +32,21 @@ describe('Array:', () => {
             var one = new types.NumericLiteral([new Token('Numeric', 1)]);
             var two = new types.NumericLiteral([new Token('Numeric', 2)]);
             var arr = helpers.createArray([one, two]);
-            expect(arr.getSourceCode()).to.eql('[1,2]');
-        });
-
-        it('should create array with severals elements and whitespace', () => {
-            var one = new types.NumericLiteral([new Token('Numeric', 1)]);
-            var two = new types.NumericLiteral([new Token('Numeric', 2)]);
-            var arr = helpers.createArray([one, two], true);
             expect(arr.getSourceCode()).to.eql('[1, 2]');
         });
 
         it('should create array with severals elements of diff types', () => {
             var one = new types.NumericLiteral([new Token('Numeric', 1)]);
             var two = new types.StringLiteral([new Token('String', '"str"')]);
-            var arr = helpers.createArray([one, two], true);
+            var arr = helpers.createArray([one, two]);
             // TODO: fix string
             // TODO: check Identifier
             expect(arr.getSourceCode()).to.eql('[1, "str"]');
-            var arr2 = helpers.createArray([one.cloneElement(), two.cloneElement(), arr], true);
+            var arr2 = helpers.createArray([one.cloneElement(), two.cloneElement(), arr]);
             expect(arr2.getSourceCode()).to.eql('[1, "str", [1, "str"]]');
+        });
+
+        describe('opts', () => {
         });
 
     });
@@ -70,9 +66,9 @@ describe('Array:', () => {
             var arr = helpers.createArray([one, two, three]);
 
             helpers.removeElementFromArray(arr, two);
-            expect(arr.getSourceCode()).to.eql('[1,"three"]');
+            // expect(arr.getSourceCode()).to.eql('[1,"three"]');
 
-            var arr2 = helpers.createArray([one.cloneElement(), (two = two.cloneElement()), three.cloneElement()], true);
+            var arr2 = helpers.createArray([one.cloneElement(), (two = two.cloneElement()), three.cloneElement()]);
 
             helpers.removeElementFromArray(arr2, two);
             expect(arr2.getSourceCode()).to.eql('[1, "three"]');
@@ -86,7 +82,7 @@ describe('Array:', () => {
             helpers.removeElementFromArray(arr, two);
             expect(arr.getSourceCode()).to.eql('[1]');
 
-            var arr2 = helpers.createArray([one.cloneElement(), (two = two.cloneElement())], true);
+            var arr2 = helpers.createArray([one.cloneElement(), (two = two.cloneElement())]);
 
             helpers.removeElementFromArray(arr2, two);
             expect(arr2.getSourceCode()).to.eql('[1]');
@@ -99,9 +95,9 @@ describe('Array:', () => {
             var arr = helpers.createArray([one, two, three]);
 
             helpers.removeElementFromArray(arr, one);
-            expect(arr.getSourceCode()).to.eql('[2,"three"]');
+            //expect(arr.getSourceCode()).to.eql('[2,"three"]');
 
-            var arr2 = helpers.createArray([(one = one.cloneElement()), two.cloneElement(), three.cloneElement()], true);
+            var arr2 = helpers.createArray([(one = one.cloneElement()), two.cloneElement(), three.cloneElement()]);
 
             helpers.removeElementFromArray(arr2, one);
             expect(arr2.getSourceCode()).to.eql('[2, "three"]');
@@ -115,7 +111,7 @@ describe('Array:', () => {
             helpers.removeElementFromArray(arr, one);
             expect(arr.getSourceCode()).to.eql('[2]');
 
-            var arr2 = helpers.createArray([(one = one.cloneElement()), two.cloneElement()], true);
+            var arr2 = helpers.createArray([(one = one.cloneElement()), two.cloneElement()]);
 
             helpers.removeElementFromArray(arr2, one);
             expect(arr2.getSourceCode()).to.eql('[2]');
