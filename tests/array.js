@@ -103,6 +103,10 @@ describe('Array:', () => {
             var arr = helpers.createArray([one]);
             helpers.removeElementFromArray(arr, one);
             expect(arr.getSourceCode()).to.eql('[]');
+
+            arr = helpers.createArray([(one = one.cloneElement())], {multiLine: true});
+            helpers.removeElementFromArray(arr, one);
+            expect(arr.getSourceCode()).to.eql('[]');
         });
 
         it('should remove from array [1, x, 3]', () => {

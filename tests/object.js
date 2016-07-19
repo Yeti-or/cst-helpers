@@ -301,6 +301,30 @@ describe('Object:', () => {
             var prop = helpers.getPropFromObjectByKeyName(obj, 1);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{}');
+
+            obj = helpers.createObject(toMap({1: one.cloneElement()}), {multiLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{}');
+
+            obj = helpers.createObject(toMap({1: one.cloneElement()}), {spaceBeforeObjectValues: false});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{}');
+
+            obj = helpers.createObject(toMap({1: one.cloneElement()}), {spaceAfterObjectKeys: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{}');
+
+            obj = helpers.createObject(toMap({1: one.cloneElement()}), {spacesInsideObjectBrackets: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{}');
+
+            obj = helpers.createObject(toMap({1: one.cloneElement()}), {paddingNewLinesInObjects: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{}');
+
+            obj = helpers.createObject(toMap({1: one.cloneElement()}), {objectKeysOnNewLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{}');
         });
 
         it('should not remove prop of diff object', () => {
@@ -345,6 +369,10 @@ describe('Object:', () => {
             helpers.removePropertyFromObjectByKeyName(obj, 2);
             expect(obj.getSourceCode()).to.eql('{1: 1,\n3: 3}');
 
+            obj = this.createObj({multiLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{\n1: 1,\n3: 3\n}');
+
         });
 
         it('should remove from object {x:x, 2:2}', () => {
@@ -379,6 +407,9 @@ describe('Object:', () => {
             helpers.removePropertyFromObjectByKeyName(obj, 1);
             expect(obj.getSourceCode()).to.eql('{2: 2}');
 
+            obj = this.createObj({multiLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{\n2: 2\n}');
         });
 
         it('should remove from object {1:1, x:x}', () => {
@@ -413,6 +444,9 @@ describe('Object:', () => {
             helpers.removePropertyFromObjectByKeyName(obj, 2);
             expect(obj.getSourceCode()).to.eql('{1: 1}');
 
+            obj = this.createObj({multiLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 2);
+            expect(obj.getSourceCode()).to.eql('{\n1: 1\n}');
         });
 
         it('should remove from object {x:x, 2:2, 3:3}', () => {
@@ -441,6 +475,9 @@ describe('Object:', () => {
             helpers.removePropertyFromObjectByKeyName(obj, 1);
             expect(obj.getSourceCode()).to.eql('{2: 2,\n3: 3}');
 
+            obj = this.createObj({multiLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 1);
+            expect(obj.getSourceCode()).to.eql('{\n2: 2,\n3: 3\n}');
         });
 
         it('should remove from object {1:1, 2:2, x:x}', () => {
@@ -469,6 +506,9 @@ describe('Object:', () => {
             helpers.removePropertyFromObjectByKeyName(obj, 3);
             expect(obj.getSourceCode()).to.eql('{1: 1,\n2: 2}');
 
+            obj = this.createObj({multiLine: true});
+            helpers.removePropertyFromObjectByKeyName(obj, 3);
+            expect(obj.getSourceCode()).to.eql('{\n1: 1,\n2: 2\n}');
         });
 
     });
