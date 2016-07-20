@@ -336,11 +336,6 @@ describe('Object:', () => {
             }).to.throw(Error);
             expect(obj1.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
             expect(obj2.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
-            expect(() => {
-                helpers.removePropertyFromObjectByKeyName(obj1, prop);
-            }).to.throw(Error);
-            expect(obj1.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
-            expect(obj2.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
         });
 
         it('should remove from object {1:1, x:x, 3:3}', () => {
