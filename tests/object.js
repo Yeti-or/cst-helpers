@@ -199,29 +199,29 @@ describe('Object:', () => {
         describe('props', () => {
             it('should get prop by it\'s key name', () => {
                 var obj = this.createObj();
-                var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+                var prop = helpers.getPropFromObject(obj, 1);
                 expect(prop.getSourceCode()).to.eql('1: 1');
 
-                prop = helpers.getPropFromObjectByKeyName(obj, 2);
+                prop = helpers.getPropFromObject(obj, 2);
                 expect(prop.getSourceCode()).to.eql('2: x');
 
-                prop = helpers.getPropFromObjectByKeyName(obj, 'three');
+                prop = helpers.getPropFromObject(obj, 'three');
                 expect(prop.getSourceCode()).to.eql('three: \'@\'');
 
-                prop = helpers.getPropFromObjectByKeyName(obj, 4);
+                prop = helpers.getPropFromObject(obj, 4);
                 expect(prop.getSourceCode()).to.eql('4: false');
             });
 
             it('should get no prop from empty obj', () => {
                 var obj = helpers.createObject(toMap({}));
-                expect(helpers.getPropFromObjectByKeyName(obj, 1)).to.eql(null);
+                expect(helpers.getPropFromObject(obj, 1)).to.eql(null);
             });
 
             it('should get no prop for wrong key', () => {
                 var obj = this.createObj();
-                var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+                var prop = helpers.getPropFromObject(obj, 1);
                 expect(prop.getSourceCode()).to.eql('1: 1');
-                prop = helpers.getPropFromObjectByKeyName(obj, 42);
+                prop = helpers.getPropFromObject(obj, 42);
                 expect(prop).to.eql(null);
             });
         });
@@ -251,6 +251,19 @@ describe('Object:', () => {
                 expect(helpers.getValuesFromObject(obj)).to.eql([]);
             });
         });
+
+        describe('value', () => {
+            it('should get one values from object', () => {
+                var obj = this.createObj();
+                var valueObj = helpers.getValueFromObject(obj, 1);
+                expect(valueObj.value).to.eql(1);
+            });
+
+            it('should get undefined from empty obj', () => {
+                var obj = helpers.createObject(toMap({}));
+                expect(helpers.getValueFromObject(obj)).to.be.undefined;
+            });
+        });
     });
 
     describe('update', () => {
@@ -265,19 +278,27 @@ describe('Object:', () => {
         });
 
         it('should update prop.value for keyName', () => {
-            // TODO : do we need such helper ?
             var obj = this.createObj();
-            var prop =  helpers.getPropFromObjectByKeyName(obj, 2);
-            prop.replaceChild(this.createObj(), prop.value);
+            helpers.updatePropValueFromObject(obj, 2, this.createObj());
             expect(obj.getSourceCode()).to.eql('{1: 1, 2: {1: 1, 2: 2, 3: 3}, 3: 3}');
         });
 
-        it('update prop.keyName for keyName', () => {
-            // TODO : do we need such helper ?
+        it('should update prop.keyName for keyName', () => {
             var obj = this.createObj();
-            var prop =  helpers.getPropFromObjectByKeyName(obj, 2);
-            prop.replaceChild(new types.StringLiteral([new Token('String', '"two"')]), prop.key);
-            expect(obj.getSourceCode()).to.eql('{1: 1, "two": 2, 3: 3}');
+            helpers.updatePropKeyFromObject(obj, 2, 'two');
+            expect(obj.getSourceCode()).to.eql('{1: 1, two: 2, 3: 3}');
+        });
+
+        it('should not update prop.value for wrong keyName', () => {
+            var obj = this.createObj();
+            helpers.updatePropValueFromObject(obj, 42, this.createObj());
+            expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
+        });
+
+        it('should not update prop.keyName for wrong keyName', () => {
+            var obj = this.createObj();
+            helpers.updatePropKeyFromObject(obj, 42, 'two');
+            expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2, 3: 3}');
         });
     });
 
@@ -298,7 +319,7 @@ describe('Object:', () => {
         it('should remove from object {x:x}', () => {
             var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
             var obj = helpers.createObject(toMap({1: one}));
-            var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+            var prop = helpers.getPropFromObject(obj, 1);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{}');
 
@@ -330,7 +351,7 @@ describe('Object:', () => {
         it('should not remove prop of diff object', () => {
             var obj1 = this.createObj();
             var obj2 = this.createObj();
-            var prop = helpers.getPropFromObjectByKeyName(obj2, 2);
+            var prop = helpers.getPropFromObject(obj2, 2);
             expect(() => {
                 helpers.removePropertyFromObject(obj1, prop);
             }).to.throw(Error);
@@ -340,7 +361,7 @@ describe('Object:', () => {
 
         it('should remove from object {1:1, x:x, 3:3}', () => {
             var obj = this.createObj();
-            var prop = helpers.getPropFromObjectByKeyName(obj, '2');
+            var prop = helpers.getPropFromObject(obj, '2');
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{1: 1, 3: 3}');
 
@@ -378,7 +399,7 @@ describe('Object:', () => {
                 return helpers.createObject(map, opts);
             };
             var obj = this.createObj();
-            var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+            var prop = helpers.getPropFromObject(obj, 1);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{2: 2}');
 
@@ -415,7 +436,7 @@ describe('Object:', () => {
                 return helpers.createObject(map, opts);
             };
             var obj = this.createObj();
-            var prop = helpers.getPropFromObjectByKeyName(obj, 2);
+            var prop = helpers.getPropFromObject(obj, 2);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{1: 1}');
 
@@ -446,7 +467,7 @@ describe('Object:', () => {
 
         it('should remove from object {x:x, 2:2, 3:3}', () => {
             var obj = this.createObj();
-            var prop = helpers.getPropFromObjectByKeyName(obj, 1);
+            var prop = helpers.getPropFromObject(obj, 1);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{2: 2, 3: 3}');
 
@@ -477,7 +498,7 @@ describe('Object:', () => {
 
         it('should remove from object {1:1, 2:2, x:x}', () => {
             var obj = this.createObj();
-            var prop = helpers.getPropFromObjectByKeyName(obj, 3);
+            var prop = helpers.getPropFromObject(obj, 3);
             helpers.removePropertyFromObject(obj, prop);
             expect(obj.getSourceCode()).to.eql('{1: 1, 2: 2}');
 
