@@ -28,7 +28,7 @@ describe('Object:', () => {
             expect(() => helpers.createObject(one)).to.throw(Error);
         });
 
-        it('should create simple object object', () => {
+        it('should create simple object', () => {
             var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
             var map = new Map();
             map.set(1, one);
@@ -86,6 +86,28 @@ describe('Object:', () => {
 
             expect(obj.getSourceCode())
                 .to.eql('{1: 1, 2: x, three: \'@@@\', 4: false}');
+        });
+
+        describe('from another', () => {
+            it('should create object from another object', () => {
+                var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
+                var map = new Map();
+                map.set(1, one);
+                var obj = helpers.createObject(map);
+                var obj2 = helpers.createObjectFromObject(obj);
+
+                expect(obj2.getSourceCode()).to.eql('{1: 1}');
+            });
+
+            it('should create object from another object with opts', () => {
+                var one = new types.NumericLiteral([Token.create('Numeric', 1)]);
+                var map = new Map();
+                map.set(1, one);
+                var obj = helpers.createObject(map);
+                var obj2 = helpers.createObjectFromObject(obj, {paddingNewLinesInObjects: true});
+
+                expect(obj2.getSourceCode()).to.eql('{\n1: 1\n}');
+            });
         });
 
         describe('opts', () => {
